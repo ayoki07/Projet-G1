@@ -13,7 +13,7 @@ from Rayonnement import donnees
 
 def donnees_dynamique(start_date,end_date) : 
     
-    filename = './weather_data/FRA_Lyon.074810_IWEC.epw'
+    filename = './FRA_Lyon.074810_IWEC.epw'
     [data, meta] = read_epw(filename, coerce_year=None)
     data
     # Extract the month and year from the DataFrame index with the format 'MM-YYYY'
