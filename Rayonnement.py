@@ -10,7 +10,7 @@ def donnees(moment) :
 
 
 
-    filename = './weather_data/FRA_Lyon.074810_IWEC.epw'
+    filename = './FRA_Lyon.074810_IWEC.epw'
     
     
     

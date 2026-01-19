@@ -1,3 +1,4 @@
+
 # # -*- coding: utf-8 -*-
 
 
@@ -28,8 +29,8 @@ dico_moyen_ete, T_ext_ete = moyenne(start_date,end_date)
 
 
 
-largeur = 4     # largeur des pièces
-longueur = 8    # longueur de l'appartement
+largeur = 3     # largeur des pièces
+longueur = 9    # longueur de l'appartement
 hauteur = 3     # hauteur des murs 
 
 ## définitions de dictionnaires des différents composants
@@ -47,7 +48,7 @@ concrete = {'Conductivity': 1.400,          # W/(m·K)
 insulation = {'Conductivity': 0.027,        # W/(m·K)
               'Density': 55.0,              # kg/m³
               'Specific heat': 1210,        # J/(kg⋅K)
-              'Width': 0.08}                # m
+              'Width': 0.16}                # m
 
 glass = {'Conductivity': 1.4,               # W/(m·K)
           'Density': 2500,                   # kg/m³
@@ -56,7 +57,7 @@ glass = {'Conductivity': 1.4,               # W/(m·K)
           'Surface': 2,
           'Transmission': 0.8}                     # m²
 
-door = {'Conductivity': 0.1,  
+door = {'Conductivity': 0.1, 
         'Width': 0.04,  
         'Surface' : 2}                     # m²
 
@@ -79,14 +80,14 @@ h = pd.DataFrame([{'in': 8., 'out': 25}], index=['h'])
 #thermostat ######
 KpN = 1e-4 #pièce nord, no controller Kp -> 0
 KpS = 1e3 #pièce Sud, almost perfect controller Kp -> ∞
-Tc_hiver = 22
-Tc_ete = 18
+Tc_hiver = 19
+Tc_ete = 23
 
 ## flux utilisateur
 Qa = 80 #~80 par personne, ici c'est celui de la pièce Nord (four, télé, personnes)
 
 #éclairement
-alpha_ext=0.5
+alpha_ext=0.8
 alpha_in=0.4
 tau=0.3
 
@@ -172,9 +173,9 @@ b_ete = pd.DataFrame(b_ete, index=q, columns=[1])
 G_cd = wall['Conductivity'] / wall['Width']
 pd.DataFrame(G_cd, columns=['Conductance'])
 ##G de des infiltrations d'air pour les différentes parois
-ACH = {'S': 2, 
-        'I': 2,
-      'N':4}
+ACH = {'S': 3, 
+        'I': 3,
+      'N':6}
 Va_dot = {'S' : ACH['S'] / 3600 * air['Volume'],
               'I' : ACH['I'] / 3600 * air['Volume'],
               'N' : ACH['N'] / 3600 * air['Volume']}
@@ -282,18 +283,18 @@ y_hiver = inv(A.T @ G @ A) @ (A.T @ G @ b_hiver + f_hiver)
 y_ete = inv(A.T @ G @ A) @ (A.T @ G @ b_ete + f_ete)
 print(y_ete)
 
-plt.plot(y_hiver,'-b')
-plt.plot([0,14],[T_ext_hiver, T_ext_hiver],"*c")
-plt.plot([5,9],[Tc_hiver, Tc_hiver],"*g")
+#plt.plot(y_hiver,'-b')
+#plt.plot([0,14],[T_ext_hiver, T_ext_hiver],"*c")
+#plt.plot([5,9],[Tc_hiver, Tc_hiver],"*g")
 
-plt.plot(y_ete, '-r')
-plt.plot([0,14],[T_ext_ete, T_ext_ete], color = 'pink', marker = '*', linestyle = 'None')
-plt.plot([5,9],[Tc_ete, Tc_ete], color = 'orange', marker = '*', linestyle = 'None')
+#plt.plot(y_ete, '-r')
+#plt.plot([0,14],[T_ext_ete, T_ext_ete], color = 'pink', marker = '*', linestyle = 'None')
+#plt.plot([5,9],[Tc_ete, Tc_ete], color = 'orange', marker = '*', linestyle = 'None')
 
-plt.title("Température dans les 15 noeuds définis dans le logement étudié")
-plt.xlabel("Du Nord au Sud ->") 
-plt.ylabel("Température en °C")
-plt.legend(["Températures en chaque point en hiver","Températures extérieures en hiver","Températures visées par le controller en hiver","Températures en chaque point en été","Températures extérieures en été","Températures visées par le controller en été"])
+#plt.title("Température dans les 15 noeuds définis dans le logement étudié")
+#plt.xlabel("Du Nord au Sud ->") 
+#plt.ylabel("Température en °C")
+#plt.legend(["Températures en chaque point en hiver","Températures extérieures en hiver","Températures visées par le controller en hiver","Températures en chaque point en été","Températures extérieures en été","Températures visées par le controller en été"])
 
 
 #recerche des flux
@@ -309,3 +310,61 @@ print(q_hiver)
 
 q_ete = G @ (b_ete - (A @ y_ete))
 print(q_ete)
+
+plt.figure(figsize=(12, 6))
+
+# Tracé des courbes pour l'hiver (bleu) et l'été (rouge)
+plt.plot(range(15), y_hiver.values, '-b', label="Hiver (statique moyen)", linewidth=2, marker='o')
+plt.plot(range(15), y_ete.values, '-r', label="Été (statique moyen)", linewidth=2, marker='s')
+
+# Points de référence pour l'Hiver
+plt.scatter([0, 14], [T_ext_hiver, T_ext_hiver], color='cyan', edgecolors='black', zorder=5, label="T_ext Hiver")
+plt.scatter([5, 9], [Tc_hiver, Tc_hiver], color='green', marker='X', s=100, zorder=5, label="Consigne Hiver (Pcs Nord/Sud)")
+
+# Points de référence pour l'Été
+plt.scatter([0, 14], [T_ext_ete, T_ext_ete], color='pink', edgecolors='black', zorder=5, label="T_ext Été")
+plt.scatter([5, 9], [Tc_ete, Tc_ete], color='orange', marker='X', s=100, zorder=5, label="Consigne Été (Pcs Nord/Sud)")
+
+# Mise en forme
+plt.xticks(range(15), [f'θ{i}' for i in range(15)])
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.title("Profil des températures aux nœuds (Hiver vs Été)", fontsize=14)
+plt.xlabel("Position des nœuds (Mur Nord -> Pièce N -> Mur Milieu -> Pièce S -> Mur Sud)")
+plt.ylabel("Température [°C]")
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.tight_layout()
+
+plt.show()
+
+print(dico_moyen_ete,dico_moyen_hiver)
+print(EN_ete,EN_hiver)
+
+# --- CALCUL DE LA CONSOMMATION ÉNERGÉTIQUE (Régime Statique) ---
+
+# 1. Définition de la durée (24 heures pour une journée moyenne)
+duree_secondes = 24 * 3600 
+
+# 2. Extraction des flux des contrôleurs (branches q19 et q20)
+# Rappel : le flux q est en Watts. Dans votre code, q_hiver et q_ete sont déjà des vecteurs de flux.
+# Branche 19 = Radiateur Nord | Branche 20 = Radiateur Sud
+q_HVAC_hiver = q_hiver.loc['q19', 1] + q_hiver.loc['q20', 1]
+q_HVAC_ete = q_ete.loc['q19', 1] + q_ete.loc['q20', 1]
+
+# 3. Calcul de l'énergie pour la journée (Joules)
+# On sépare chauffage (positif) et refroidissement (négatif)
+E_hiver_J = q_HVAC_hiver * duree_secondes
+E_ete_J = q_HVAC_ete * duree_secondes
+
+# 4. Conversion en kWh (1 kWh = 3.6e6 Joules)
+E_hiver_kWh = abs(E_hiver_J) / 3.6e6
+E_ete_kWh = abs(E_ete_J) / 3.6e6
+
+print("\n" + "="*40)
+print("BILAN ÉNERGÉTIQUE JOURNALIER (MOYEN)")
+print("="*40)
+print(f"Hiver (Chauffage) : {E_hiver_kWh:.2f} kWh/jour")
+print(f"Été (Refroidissement) : {E_ete_kWh:.2f} kWh/jour")
+print("-" * 40)
+print(f"Puissance moyenne appelée en Hiver : {q_HVAC_hiver:.1f} W")
+print(f"Puissance moyenne appelée en Été : {abs(q_HVAC_ete):.1f} W")
+print("="*40)

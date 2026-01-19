@@ -26,8 +26,8 @@ alpha_ext=0.5
 alpha_in=0.4
 tau=0.3
 
-largeur = 4     # largeur des pièces
-longueur = 8    # longueur de l'appartement
+largeur = 3     # largeur des pièces
+longueur = 9    # longueur de l'appartement
 hauteur = 3     # hauteur des murs 
 
 ## définitions de dictionnaires des différents composants
@@ -45,7 +45,7 @@ concrete = {'Conductivity': 1.400,          # W/(m·K)
 insulation = {'Conductivity': 0.027,        # W/(m·K)
               'Density': 55.0,              # kg/m³
               'Specific heat': 1210,        # J/(kg⋅K)
-              'Width': 0.08}                # m
+              'Width': 0.16}                # m
 
 glass = {'Conductivity': 1.4,               # W/(m·K)
          'Density': 2500,                   # kg/m³
@@ -77,8 +77,8 @@ h = pd.DataFrame([{'in': 8., 'out': 25}], index=['h'])
 #thermostat ######
 KpN = 1e-4 #pièce nord, no controller Kp -> 0
 KpS = 1e3 #pièce Sud, almost perfect controller Kp -> ∞
-Tc = 18 #été
-#Tc = 21 #hiver
+Tc = 23 #été
+#Tc = 19 #hiver
 
 ## flux utilisateur
 Qa = 80 #~80 par personne, ici c'est celui de la pièce Nord (four, télé, personnes)
